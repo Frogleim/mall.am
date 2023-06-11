@@ -57,3 +57,60 @@ def remove_data(service_path, field_value):
         return True
     except Exception:
         return False
+
+
+def add_card(customer_email, card_holder_name, card_type, card_number, date, cvv, service_path):
+    auth(service_path)
+    db = firestore.client()
+    random_doc_id = random.randint(10, 999999)
+    random_id = random.randint(1, 9999)
+    order_data = {
+        'order_id': random_id,
+        'customer_email': customer_email,
+        'card_holder_name': card_holder_name,
+        'card_type': card_type,
+        'card_number': card_number,
+        'date': date,
+        'cvv': cvv
+    }
+    try:
+        doc_ref = db.collection('users_card_data').document(str(random_doc_id))
+        doc_ref.set(order_data)
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def add_address(customer_email, address, zipcode, city, customer_phone_number,  service_path):
+    auth(service_path)
+    db = firestore.client()
+    random_doc_id = random.randint(10, 999999)
+    random_id = random.randint(1, 9999)
+    order_data = {
+        'order_id': random_id,
+        'customer_email': customer_email,
+        'address': address,
+        'zipcode': zipcode,
+        'city': city,
+        'customer_phone_number': customer_phone_number,
+    }
+    try:
+        doc_ref = db.collection('users_card_data').document(str(random_doc_id))
+        doc_ref.set(order_data)
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def get_card_information(service_path, field_value):
+    orders = []
+    auth(service_path=service_path)
+    db = firestore.client()
+    field_name = 'customer_email'
+    query = db.collection('users_card_data').where(field_name, '==', field_value)
+    results = query.get()
+    for doc in results:
+        orders.append(doc.to_dict())
+    return orders

@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import requests
 from starlette.middleware.cors import CORSMiddleware
 from db.users import users_orders
+from models import bakcend_models
 
 
 def get_clothes():
@@ -20,22 +20,6 @@ def get_clothes():
     return response.json()
 
 
-class UserOrder(BaseModel):
-    customer_email: str
-    product_name: str
-    product_price: str
-    product_image_url: str
-    count: str
-
-
-class Cart(BaseModel):
-    customer_email: str
-
-
-class RemoveData(BaseModel):
-    customer_email: str
-
-
 app = FastAPI()
 
 origins = ["*"]
@@ -50,7 +34,7 @@ app.add_middleware(
 
 
 @app.post('/add_to_cart')
-def make_order(body: UserOrder):
+def make_order(body: bakcend_models.UserOrder):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
     order = users_orders.add_order(
         body.customer_email,
@@ -86,13 +70,50 @@ def check_order(customer_email: str):
 
 
 @app.post('/remove_data')
-def remove_data(body: RemoveData):
+def remove_data(body: bakcend_models.RemoveData):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
     remove_data_in_cart = users_orders.remove_data(service_path=service_path, field_value=body.customer_email)
     if remove_data_in_cart:
         return {"Message": "Success"}
     else:
         return {"Message": "false"}
+
+
+@app.post('/add_card/')
+def add_card(body: bakcend_models.UsersCardData):
+    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    add_card_information = users_orders.add_card(
+        body.customer_email,
+        body.card_holder_name,
+        body.card_type,
+        body.card_number,
+        body.date,
+        body.cvv,
+        service_path
+    )
+
+    if add_card_information:
+        return {"Message": "Success"}
+    else:
+        return {"Message": 'false'}
+
+
+@app.post('/add_address/')
+def add_address(body: bakcend_models.UsersAddress):
+    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    add_card_information = users_orders.add_address(
+        body.customer_email,
+        body.address,
+        body.zipcode,
+        body.city,
+        body.customer_phone_number,
+        service_path
+    )
+
+    if add_card_information:
+        return {"Message": "Success"}
+    else:
+        return {"Message": 'false'}
 
 
 @app.get('/clothes')
