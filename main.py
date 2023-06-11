@@ -120,3 +120,10 @@ def add_address(body: bakcend_models.UsersAddress):
 def clothes():
     print(get_clothes())
     return get_clothes()
+
+
+@app.get('/check_card_information/{customer_email}')
+def check_card_information(customer_email: str):
+    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    orders = users_orders.get_card_information(service_path=service_path, field_value=customer_email)
+    return orders
