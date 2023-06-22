@@ -59,16 +59,14 @@ def remove_data(service_path, field_value):
         return False
 
 
-def add_card(customer_email, card_holder_name, card_type, card_number, date, cvv, service_path):
+def add_card(customer_email, card_holder_name, card_number, date, cvv, service_path):
     auth(service_path)
     db = firestore.client()
     random_doc_id = random.randint(10, 999999)
-    random_id = random.randint(1, 9999)
     order_data = {
-        'order_id': random_id,
         'customer_email': customer_email,
         'card_holder_name': card_holder_name,
-        'card_type': card_type,
+        # 'card_type': card_type,
         'card_number': card_number,
         'date': date,
         'cvv': cvv
@@ -82,18 +80,15 @@ def add_card(customer_email, card_holder_name, card_type, card_number, date, cvv
         return False
 
 
-def add_address(customer_email, address, zipcode, city, customer_phone_number,  service_path):
+def add_address(customer_email, address, service_path):
     auth(service_path)
     db = firestore.client()
     random_doc_id = random.randint(10, 999999)
-    random_id = random.randint(1, 9999)
     order_data = {
-        'order_id': random_id,
         'customer_email': customer_email,
         'address': address,
-        'zipcode': zipcode,
-        'city': city,
-        'customer_phone_number': customer_phone_number,
+
+        # 'card_type': card_type,
     }
     try:
         doc_ref = db.collection('users_card_data').document(str(random_doc_id))

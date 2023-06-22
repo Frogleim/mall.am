@@ -85,7 +85,6 @@ def add_card(body: bakcend_models.UsersCardData):
     add_card_information = users_orders.add_card(
         body.customer_email,
         body.card_holder_name,
-        body.card_type,
         body.card_number,
         body.date,
         body.cvv,
@@ -99,22 +98,17 @@ def add_card(body: bakcend_models.UsersCardData):
 
 
 @app.post('/add_address/')
-def add_address(body: bakcend_models.UsersAddress):
+def add_delivery_address(body: bakcend_models.UsersAddress):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    add_card_information = users_orders.add_address(
+    add_address = users_orders.add_address(
         body.customer_email,
         body.address,
-        body.zipcode,
-        body.city,
-        body.customer_phone_number,
         service_path
     )
-
-    if add_card_information:
-        return {"Message": "Success"}
+    if add_address:
+        return {"Message": 'Success'}
     else:
-        return {"Message": 'false'}
-
+        return {'Message': "False"}
 
 @app.get('/clothes')
 def clothes():

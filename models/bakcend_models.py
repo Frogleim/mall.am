@@ -20,7 +20,6 @@ class RemoveData(BaseModel):
 class UsersCardData(BaseModel):
     customer_email: str
     card_holder_name: str
-    card_type: str
     card_number: str
     date: str
     cvv: str
@@ -29,6 +28,4 @@ class UsersCardData(BaseModel):
 class UsersAddress(BaseModel):
     customer_email: str
     address: str
-    zipcode: str
-    city: str
-    customer_phone_number: str
+
