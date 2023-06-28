@@ -110,6 +110,26 @@ def add_delivery_address(body: bakcend_models.UsersAddress):
     else:
         return {'Message': "False"}
 
+
+@app.get('/address/{customer_email}')
+def get_users_address(customer_email: str):
+    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    address = users_orders.get_address(service_path=service_path, customer_email=customer_email)
+    for docs in address:
+        print(docs['address'])
+        street_address = docs['address'].split(', ')[0]
+        city = docs['address'].split(', ')[1]
+        zipcode = docs['address'].split(', ')[2]
+        country = docs['address'].split(', ')[3]
+        return {
+            "customer_email": docs['customer_email'],
+            "street": street_address,
+            "city": city,
+            "zipcode": zipcode,
+            "country": country
+        }
+
+
 @app.get('/clothes')
 def clothes():
     print(get_clothes())

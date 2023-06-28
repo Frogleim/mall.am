@@ -91,12 +91,25 @@ def add_address(customer_email, address, service_path):
         # 'card_type': card_type,
     }
     try:
-        doc_ref = db.collection('users_card_data').document(str(random_doc_id))
+        doc_ref = db.collection('users_shipping_address').document(str(random_doc_id))
         doc_ref.set(order_data)
         return True
     except Exception as e:
         print(e)
         return False
+
+
+def get_address(service_path, customer_email):
+    addresses = []
+    auth(service_path=service_path)
+    db = firestore.client()
+    user_email = 'customer_email'
+    query = db.collection('users_shipping_address').where(user_email, '==', customer_email)
+    result = query.get()
+    print(result)
+    for docs in result:
+        addresses.append(docs.to_dict())
+    return addresses
 
 
 def get_card_information(service_path, field_value):
