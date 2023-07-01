@@ -82,6 +82,7 @@ def add_card(customer_email, card_holder_name, card_number, date, cvv, service_p
 
 def add_address(customer_email, address, service_path):
     auth(service_path)
+    check_address(service_path, customer_email)
     db = firestore.client()
     random_doc_id = random.randint(10, 999999)
     order_data = {
@@ -90,6 +91,7 @@ def add_address(customer_email, address, service_path):
 
         # 'card_type': card_type,
     }
+
     try:
         doc_ref = db.collection('users_shipping_address').document(str(random_doc_id))
         doc_ref.set(order_data)
@@ -110,6 +112,24 @@ def get_address(service_path, customer_email):
     for docs in result:
         addresses.append(docs.to_dict())
     return addresses
+
+
+def check_address(service_path, customer_email):
+    addresses = []
+    auth(service_path=service_path)
+    db = firestore.client()
+    user_email = 'customer_email'
+    query = db.collection('users_shipping_address').where(user_email, '==', customer_email)
+    result = query.get()
+    print(result)
+    try:
+        for docs in result:
+            addresses.append(docs.to_dict())
+            if len(addresses) != 0:
+                print('Address exist, deleting....')
+                docs.reference.delete()
+    except Exception:
+        print(f'No address for user {customer_email}')
 
 
 def get_card_information(service_path, field_value):

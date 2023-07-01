@@ -136,8 +136,21 @@ def clothes():
     return get_clothes()
 
 
+@app.get('/get_card_information/{customer_email}')
+def get_card_information(customer_email: str):
+    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    orders = users_orders.get_card_information(service_path=service_path, field_value=customer_email)
+    print(type(orders))
+    return orders
+
+
 @app.get('/check_card_information/{customer_email}')
 def check_card_information(customer_email: str):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
     orders = users_orders.get_card_information(service_path=service_path, field_value=customer_email)
-    return orders
+    print(type(orders))
+    if len(orders) > 0:
+        return 0
+    else:
+        raise HTTPException(status_code=404, detail=f'No card information for user {customer_email}')
+
