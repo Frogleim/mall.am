@@ -1,3 +1,5 @@
+import json
+
 from fastapi import FastAPI, HTTPException
 import requests
 from starlette.middleware.cors import CORSMiddleware
@@ -154,3 +156,19 @@ def check_card_information(customer_email: str):
     else:
         raise HTTPException(status_code=404, detail=f'No card information for user {customer_email}')
 
+
+@app.get('/brands/')
+def get_brands():
+    with open('./models/data/brands.json', 'r') as f:
+        data = json.load(f)
+    return data
+
+
+@app.get('/check_shop/{shop_name}')
+def check_shop(shop_name: str):
+    if shop_name == 'asos':
+        return {"Message": "found", "type": "asos"}
+    elif shop_name == 'mall':
+        return {"Message": "found", "type": "mall"}
+    else:
+        raise HTTPException(status_code=404, detail='Not found')
