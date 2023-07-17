@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import random
+from . import admin_db
 
 
 def auth(service_path):
@@ -32,7 +33,7 @@ def add_order(customer_email, product_name, product_price, product_image_url, co
         return False
 
 
-def get_data(service_path, field_value):
+def get_cart(service_path, field_value):
     orders = []
     auth(service_path=service_path)
     db = firestore.client()
@@ -142,3 +143,8 @@ def get_card_information(service_path, field_value):
     for doc in results:
         orders.append(doc.to_dict())
     return orders
+
+
+def create_order(service_path, customer_email):
+    cart_data = get_cart(service_path, field_value=customer_email)
+    admin_db.insert_data(cart_data)

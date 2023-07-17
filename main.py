@@ -54,16 +54,17 @@ def make_order(body: bakcend_models.UserOrder):
 
 
 @app.get('/cart/{customer_email}')
-def get_order(customer_email: str):
+def get_cart(customer_email: str):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    orders = users_orders.get_data(service_path=service_path, field_value=customer_email)
+    orders = users_orders.get_cart(service_path=service_path, field_value=customer_email)
+    # users_orders.create_order(service_path, customer_email)
     return orders
 
 
 @app.get('/check_cart/{customer_email}')
 def check_order(customer_email: str):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    orders = users_orders.get_data(service_path=service_path, field_value=customer_email)
+    orders = users_orders.get_cart(service_path=service_path, field_value=customer_email)
     print(type(orders))
     if len(orders) == 0:
         return "null"
@@ -74,6 +75,7 @@ def check_order(customer_email: str):
 @app.post('/remove_data')
 def remove_data(body: bakcend_models.RemoveData):
     service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
+    users_orders.create_order(service_path, body.customer_email)
     remove_data_in_cart = users_orders.remove_data(service_path=service_path, field_value=body.customer_email)
     if remove_data_in_cart:
         return {"Message": "Success"}
