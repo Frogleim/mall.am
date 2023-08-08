@@ -1,10 +1,10 @@
 import json
-
 from fastapi import FastAPI, HTTPException
 import requests
 from starlette.middleware.cors import CORSMiddleware
 from db.users import users_orders
 from models import bakcend_models
+from collections import defaultdict
 
 
 def get_clothes():
@@ -36,18 +36,17 @@ app.add_middleware(
 
 
 @app.post('/add_to_cart')
-def make_order(body: bakcend_models.UserOrder):
-    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    order = users_orders.add_order(
+def add_to_cart(body: bakcend_models.UserCart):
+    user_cart = users_orders.add_to_cart(
         body.customer_email,
+        body.shop_name,
         body.product_name,
         body.product_price,
         body.product_image_url,
         body.count,
-        service_path
-
+        body.product_total_price,
     )
-    if order:
+    if user_cart:
         return {"Message": "Success"}
     else:
         raise HTTPException(status_code=400, detail="Something Went wrong! Please try again")
@@ -55,16 +54,14 @@ def make_order(body: bakcend_models.UserOrder):
 
 @app.get('/cart/{customer_email}')
 def get_cart(customer_email: str):
-    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    orders = users_orders.get_cart(service_path=service_path, field_value=customer_email)
-    # users_orders.create_order(service_path, customer_email)
-    return orders
+    data = users_orders.get_cart(customer_email)
+
+    return {"Message": data}
 
 
 @app.get('/check_cart/{customer_email}')
 def check_order(customer_email: str):
-    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    orders = users_orders.get_cart(service_path=service_path, field_value=customer_email)
+    orders = users_orders.get_cart(customer_email)
     print(type(orders))
     if len(orders) == 0:
         return "null"
@@ -74,13 +71,25 @@ def check_order(customer_email: str):
 
 @app.post('/remove_data')
 def remove_data(body: bakcend_models.RemoveData):
-    service_path = './db/users/services/ontime-bca87-firebase-adminsdk-hpaht-6e95f71370.json'
-    users_orders.create_order(service_path, body.customer_email)
-    remove_data_in_cart = users_orders.remove_data(service_path=service_path, field_value=body.customer_email)
+    remove_data_in_cart = users_orders.remove_data(body.customer_email, body.product_name)
     if remove_data_in_cart:
         return {"Message": "Success"}
     else:
         return {"Message": "false"}
+
+
+@app.post('/change_count')
+def change_count(body: bakcend_models.CountModel):
+    count_model_handler = users_orders.count_handler(
+        body.customer_email,
+        body.command,
+        body.count,
+        body.product_name
+    )
+    if count_model_handler:
+        return {'Message': "Count Changed Successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Something Went wrong! Please try again")
 
 
 @app.post('/add_card/')
@@ -161,9 +170,18 @@ def check_card_information(customer_email: str):
 
 @app.get('/brands/')
 def get_brands():
-    with open('./models/data/brands.json', 'r') as f:
-        data = json.load(f)
-    return data
+    brands_data = users_orders.read_brands()
+    print(brands_data)
+    brands_list = []
+    for rows in brands_data:
+        name, logo = rows
+        d = {
+            "name": name,
+            "logo": logo
+        }
+        print(d)
+        brands_list.append(d)
+    return brands_list
 
 
 @app.get('/check_shop/{shop_name}')

@@ -1,12 +1,14 @@
 from pydantic import BaseModel
 
 
-class UserOrder(BaseModel):
+class UserCart(BaseModel):
     customer_email: str
     product_name: str
     product_price: str
     product_image_url: str
-    count: str
+    count: int
+    product_total_price: str
+    shop_name: str
 
 
 class Cart(BaseModel):
@@ -15,6 +17,15 @@ class Cart(BaseModel):
 
 class RemoveData(BaseModel):
     customer_email: str
+    product_name: str
+
+
+class CountModel(BaseModel):
+    customer_email: str
+    command: str
+    count: int
+    product_name: str
+
 
 
 class UsersCardData(BaseModel):
