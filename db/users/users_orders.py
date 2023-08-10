@@ -1,5 +1,4 @@
 import json
-
 import firebase_admin
 import psycopg2
 from firebase_admin import credentials
@@ -17,19 +16,47 @@ def auth(service_path):
 def add_to_cart(customer_email, shop_name, product_name, product_price, product_image_url, count, product_total_price):
     my_connect = Connect()
     conn = my_connect.connect()
+
     try:
         with conn.cursor() as cursor:
-            insert_query = """INSERT INTO mall_am_userscart (
-            user_email, product_name, shop_name, count, 
-            product_image, product_price, product_total_price) VALUES (%s, %s, %s, %s, %s, %s, %s); 
-                               """
+            # Check if the product already exists in the cart
+            check_query = "SELECT * FROM mall_am_userscart WHERE user_email = %s AND product_name = %s"
+            cursor.execute(check_query, (customer_email, product_name))
+            existing_row = cursor.fetchone()
 
-            data = (customer_email, product_name,  shop_name,  count,  product_image_url, product_price,
-                    product_total_price)
-            cursor.execute(insert_query, data)
+            if existing_row:
+                # Update the existing row with the new count and total price
+                new_count = existing_row[4] + count
+                new_total_price = existing_row[7] * new_count
+                print(new_total_price)
+                update_query = """
+                    UPDATE mall_am_userscart 
+                    SET count = %s, product_total_price = %s 
+                    WHERE user_email = %s AND product_name = %s
+                """
+                cursor.execute(update_query, (new_count, new_total_price, customer_email, product_name))
+            else:
+                # Insert a new row since the product doesn't exist in the cart
+                insert_query = """
+                    INSERT INTO mall_am_userscart (
+                        user_email, product_name, shop_name, count, 
+                        product_image, product_price, product_total_price
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+                """
+                data = (
+                    customer_email,
+                    product_name,
+                    shop_name,
+                    count,
+                    product_image_url,
+                    product_price,
+                    str(product_total_price),  # Convert to string before passing
+                )
+                cursor.execute(insert_query, data)
+
             conn.commit()
-        print("Saved successfully!")
-        return True
+            print("Saved successfully!")
+            return True
     except Exception as e:
         print(e)
         return False
@@ -49,6 +76,21 @@ def get_cart(customer_email):
         return False
 
 
+def remove_all_cart(customer_email):
+    my_connect = Connect()
+    conn = my_connect.connect()
+    try:
+        with conn.cursor() as cursor:
+            delete_query = "DELETE FROM mall_am_userscart WHERE user_email = %s;"
+            cursor.execute(delete_query, (customer_email,))
+            conn.commit()
+            print("Rows removed successfully!")
+        return True
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL:", error)
+        return False
+
+
 def remove_data(customer_email, product_name):
     my_connect = Connect()
     conn = my_connect.connect()
@@ -60,29 +102,6 @@ def remove_data(customer_email, product_name):
             print("Rows removed successfully!")
         return True
     except (Exception, psycopg2.Error) as error:
-        print("Error while connecting to PostgreSQL:", error)
-        return False
-
-
-def count_handler(customer_email, command, count, product_name):
-    my_connect = Connect()
-    conn = my_connect.connect()
-    try:
-        with conn.cursor() as cursor:
-            if command == "up":
-                count += 1
-                change_query = "UPDATE mall_am_userscart SET count = %s WHERE user_email = %s AND product_name = %s"
-                cursor.execute(change_query, (count, customer_email, product_name))
-                conn.commit()
-                print("Rows removed successfully!")
-            else:
-                count -= 1
-                change_query = "UPDATE mall_am_userscart SET count = %s WHERE user_email = %s AND product_name = %s"
-                cursor.execute(change_query, (count, customer_email, product_name))
-                conn.commit()
-                print("Rows removed successfully!")
-        return True
-    except Exception as error:
         print("Error while connecting to PostgreSQL:", error)
         return False
 
@@ -241,6 +260,25 @@ def users_orders(email, address, phone_number=None):
 
     except Exception:
         pass
+
+
+def get_total_price(customer_email):
+    my_connect = Connect()
+    conn = my_connect.connect()
+    try:
+        with conn.cursor() as cursor:
+            insert_query = "SELECT product_total_price FROM mall_am_userscart WHERE user_email = %s"
+            data = (customer_email,)
+            cursor.execute(insert_query, data)
+            rows = cursor.fetchall()
+
+            conn.commit()
+        print("Saved successfully!")
+        return rows
+    except Exception:
+        pass
+
+
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import json
 from fastapi import FastAPI, HTTPException
 import requests
 from starlette.middleware.cors import CORSMiddleware
-from db.users import users_orders
+from db.users import users_orders, auth
 from models import bakcend_models
 from collections import defaultdict
 
@@ -35,6 +35,14 @@ app.add_middleware(
 )
 
 
+@app.post('/users_info/')
+def insert_users_info(body: bakcend_models.UsersInfo):
+    user_auth = auth.get_user_information(
+        body.email,
+        body.phone_number
+
+    )
+
 @app.post('/add_to_cart')
 def add_to_cart(body: bakcend_models.UserCart):
     user_cart = users_orders.add_to_cart(
@@ -55,8 +63,25 @@ def add_to_cart(body: bakcend_models.UserCart):
 @app.get('/cart/{customer_email}')
 def get_cart(customer_email: str):
     data = users_orders.get_cart(customer_email)
-
+    print(data)
     return {"Message": data}
+
+
+def merge_cart_items(cart_items):
+    merged_data = []
+    seen_products = {}  # To keep track of products already seen
+
+    for item in cart_items:
+        product_key = (item[2], item[6])  # Using product name and price as a key
+
+        if product_key in seen_products:
+            existing_item = seen_products[product_key]
+            existing_item[4] += item[4]  # Update the count
+        else:
+            merged_data.append(list(item))
+            seen_products[product_key] = merged_data[-1]
+
+    return merged_data
 
 
 @app.get('/check_cart/{customer_email}')
@@ -78,18 +103,15 @@ def remove_data(body: bakcend_models.RemoveData):
         return {"Message": "false"}
 
 
-@app.post('/change_count')
-def change_count(body: bakcend_models.CountModel):
-    count_model_handler = users_orders.count_handler(
-        body.customer_email,
-        body.command,
-        body.count,
-        body.product_name
-    )
-    if count_model_handler:
-        return {'Message': "Count Changed Successfully"}
-    else:
-        raise HTTPException(status_code=400, detail="Something Went wrong! Please try again")
+@app.get('/total_price/{customer_email}')
+def get_total_prices(customer_email: str):
+    data = users_orders.get_total_price(customer_email)
+    total = 0
+    for item in data:
+        total += item[0]
+
+    print("Total:", total)
+    return round(total, 1)
 
 
 @app.post('/add_card/')
@@ -141,6 +163,15 @@ def get_users_address(customer_email: str):
             "zipcode": zipcode,
             "country": country
         }
+
+
+@app.post('/remove_all_cart')
+def remove_all(customer_email: str):
+    remove_cart = users_orders.remove_all_cart(customer_email)
+    if remove_cart:
+        return {"Message": "Success"}
+    else:
+        raise HTTPException(status_code=401, detail='Something went wrong')
 
 
 @app.get('/clothes')
