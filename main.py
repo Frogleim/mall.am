@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 import requests
 from starlette.middleware.cors import CORSMiddleware
 from db.users import users_orders, auth
+from db.users.brands_api import zara_api
 from models import bakcend_models
 from collections import defaultdict
 
@@ -35,13 +36,18 @@ app.add_middleware(
 )
 
 
-@app.post('/users_info/')
+@app.post('/users_info')
 def insert_users_info(body: bakcend_models.UsersInfo):
     user_auth = auth.get_user_information(
         body.email,
         body.phone_number
 
     )
+    if user_auth:
+        return {"Message": "Success"}
+    else:
+        raise HTTPException(status_code=401, detail="Something went wrong!")
+
 
 @app.post('/add_to_cart')
 def add_to_cart(body: bakcend_models.UserCart):
@@ -165,7 +171,7 @@ def get_users_address(customer_email: str):
         }
 
 
-@app.post('/remove_all_cart')
+@app.get('/remove_all_cart/{customer_email}')
 def remove_all(customer_email: str):
     remove_cart = users_orders.remove_all_cart(customer_email)
     if remove_cart:
@@ -221,5 +227,22 @@ def check_shop(shop_name: str):
         return {"Message": "found", "type": "asos"}
     elif shop_name == 'mall':
         return {"Message": "found", "type": "mall"}
+    elif shop_name == 'Zara':
+        get_zara_categories = zara_api.get_categories()
+        return {"Message": "found", "type": "Zara"}
+
     else:
         raise HTTPException(status_code=404, detail='Not found')
+
+
+@app.get('/zara_categories/')
+def zara_categories():
+    get_zara_categories = zara_api.get_categories()
+    return get_zara_categories
+
+
+@app.get('/zara_product/{category_id}')
+def zara_categories(category_id: str):
+    zara_product = zara_api.get_products(category_id)
+    return zara_product
+

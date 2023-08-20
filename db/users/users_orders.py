@@ -225,7 +225,6 @@ def read_brands():
             rows = cursor.fetchall()
             for row in rows:
                 name, logo = row
-                print(f"Name: {name}, Logo: {logo}")
         print("Saved successfully!")
         return rows
     except Exception:

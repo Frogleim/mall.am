@@ -1,8 +1,8 @@
 [
-  {"brand_name": "Zara", "brand_photo": "https://i.pinimg.com/564x/2b/e3/1f/2be31f78fd0f1029a2fd425245ce4aa8.jpg" },
-  {"brand_name":  "Massimo Dutti", "brand_photo":  "https://i.pinimg.com/564x/92/b7/ea/92b7ea87e94b179714e465dd61d995ff.jpg"},
-  {"brand_name":  "LC Waikiki", "brand_photo":  "https://i.pinimg.com/564x/91/38/bf/9138bf7b781c8954841e6ea7757e51cb.jpg"},
-  {"brand_name":  "Polo Ralph Lauren", "brand_photo":  "https://i.pinimg.com/564x/4c/da/05/4cda05e42caee3e310b6ba07579d2db8.jpg"},
-  {"brand_name":  "asos", "brand_photo":  "https://i.pinimg.com/564x/11/fd/4f/11fd4fec4bb73609036bd6e54311f74c.jpg"},
-  {"brand_name":  "mall", "brand_photo":  "https://i.pinimg.com/564x/03/75/bf/0375bfeb08c2919cec90d6a66b3d39ec.jpg"}
+  {"brand_name": "Zara", "brand_photo": "https://i.pinimg.com/564x/2b/e3/1f/2be31f78fd0f1029a2fd425245ce4aa8.jpg", "category": "Clothes" },
+  {"brand_name":  "Massimo Dutti", "brand_photo":  "https://i.pinimg.com/564x/92/b7/ea/92b7ea87e94b179714e465dd61d995ff.jpg", "category": "Clothes"},
+  {"brand_name":  "LC Waikiki", "brand_photo":  "https://i.pinimg.com/564x/91/38/bf/9138bf7b781c8954841e6ea7757e51cb.jpg", "category": "Clothes"},
+  {"brand_name":  "Polo Ralph Lauren", "brand_photo":  "https://i.pinimg.com/564x/4c/da/05/4cda05e42caee3e310b6ba07579d2db8.jpg", "category": "Clothes"},
+  {"brand_name":  "asos", "brand_photo":  "https://i.pinimg.com/564x/11/fd/4f/11fd4fec4bb73609036bd6e54311f74c.jpg", "category": "Clothes"},
+  {"brand_name":  "mall", "brand_photo":  "https://i.pinimg.com/564x/03/75/bf/0375bfeb08c2919cec90d6a66b3d39ec.jpg", "category": ""}
 ]

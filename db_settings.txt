@@ -1,0 +1,14 @@
+sudo docker run --name postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=0000 -p 5432:5432 -v /data:/var/lib/postgresql/data -d postgres:alpine
+
+
+pg_dump -U postgres -h localhost -p 5432 mall.am_admin > backup.sql
+
+
+
+scp ~/Desktop/backup.sql ubuntu@13.53.200.95: .
+
+scp -i ~/Desktop/mobile\ app/ontime/backend/mallam_api/backend.pem ~/Desktop/backup.sql ubuntu@13.53.200.95:~
+
+
+
+stat ~/Desktop/mobile\ app/ontime/backend/mallam_api/backend.pem

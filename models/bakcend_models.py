@@ -43,4 +43,3 @@ class UsersAddress(BaseModel):
 class UsersInfo(BaseModel):
     email: str
     phone_number: str
-    address: str
